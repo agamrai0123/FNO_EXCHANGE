@@ -67,7 +67,7 @@ func GenerateRandomOrder() models.Order {
 	order := models.Order{
 		SessionId:            uint32(rand.Intn(99999) + 1),
 		ExchangeCode:         exchangeCodes[rand.Intn(len(exchangeCodes))],
-		EBAMatchAccount:      fmt.Sprintf("EBA%s", randomNumber(10)),
+		EbaMatchAccount:      fmt.Sprintf("EBA%s", randomNumber(10)),
 		UserId:               fmt.Sprintf("USER%s", randomString(6)),
 		Channel:              channel[rand.Intn(len(channel))],
 		CseId:                int32(rand.Intn(99999) + 1),

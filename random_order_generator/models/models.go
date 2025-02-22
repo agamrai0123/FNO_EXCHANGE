@@ -3,7 +3,7 @@ package models
 type Order struct {
 	SessionId            uint32  `json:"session_id"`
 	ExchangeCode         string  `json:"exchange_code"`
-	EBAMatchAccount      string  `json:"ebamatch_account"`
+	EbaMatchAccount      string  `json:"ebamatch_account"`
 	UserId               string  `json:"user_id"`
 	Channel              string  `json:"channel"`
 	CseId                int32   `json:"cse_id"` //added in ROUT
