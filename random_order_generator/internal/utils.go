@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/agamrai0123/FNO_EXCHANGE/ingest/models"
+	"github.com/agamrai0123/FNO_EXCHANGE/random_order_generator/models"
 )
 
 // Constants for generating random values
@@ -13,11 +13,11 @@ var (
 	exchangeCodes = []string{"NSE", "BSE", "MCX", "NFO", "BFO"}
 	channel       = []string{"CNT", "SYS", "WEB", "OFF"}
 	// productTypes  = []string{"CASH", "FUTURES", "OPTIONS"}
-	underlyings   = []string{"NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "INFY"}
-	optionTypes   = []string{"CE", "PE", "XX"}
-	exerciseTypes = []string{"EUROPEAN", "AMERICAN"}
+	underlyings = []string{"NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "INFY"}
+	// optionTypes = []string{"CE", "PE", "XX"}
+	// exerciseTypes = []string{"EUROPEAN", "AMERICAN"}
 	// orderTypes    = []string{"MARKET", "LIMIT", "SL", "SL-M"}
-	caLevels    = []string{"HIGH", "MEDIUM", "LOW"}
+	// caLevels    = []string{"HIGH", "MEDIUM", "LOW"}
 	callSources = []string{"WEB", "MOBILE", "API"}
 	vendorIds   = []string{"V001", "V002", "V003"}
 )
@@ -70,34 +70,34 @@ func GenerateRandomOrder() models.Order {
 		EBAMatchAccount:      fmt.Sprintf("EBA%s", randomNumber(10)),
 		UserId:               fmt.Sprintf("USER%s", randomString(6)),
 		Channel:              channel[rand.Intn(len(channel))],
-		CseId:                fmt.Sprintf("CSE%s", randomString(4)),
+		CseId:                int32(rand.Intn(99999) + 1),
 		PipeId:               fmt.Sprintf("PIPE%s", randomString(4)),
 		CtclId:               fmt.Sprintf("CTCL%s", randomString(4)),
 		ProductType:          randomRune("FO"),
 		Underlying:           underlyings[rand.Intn(len(underlyings))],
 		ExpiryDate:           randomDate(),
-		ExcerciseType:        exerciseTypes[rand.Intn(len(exerciseTypes))],
-		OptionType:           optionTypes[rand.Intn(len(optionTypes))],
-		StrikePrice:          uint32(rand.Intn(1000)+100) * 100, // Random strike price between 100 and 100000
+		ExcerciseType:        randomRune("EA"),
+		OptionType:           randomRune("CPX"),
+		StrikePrice:          int32(rand.Intn(1000)+100) * 100, // Random strike price between 100 and 100000
 		IndexOrStock:         randomRune("IS"),
-		CALevel:              caLevels[rand.Intn(len(caLevels))],
-		ActionId:             randomString(8),
+		CALevel:              int32(rand.Intn(99999) + 1),
+		ActionId:             int32(rand.Intn(99999) + 1),
 		BalanceAmount:        float32(rand.Float64() * 100000),
 		CanModifyFlag:        randomRune("YN"),
 		NKDBlockedFlag:       randomRune("YN"),
 		ModifyTradeDate:      randomDate(),
 		ModifyTradeTime:      randomTime(),
 		SLMFlag:              randomRune("YN"),
-		DisclosedQuantity:    uint32(rand.Intn(100) + 1),
-		TotalOrderQuantity:   uint32(rand.Intn(1000) + 1),
-		LimitRate:            uint32(rand.Intn(10000) + 100),
-		StopLossTrigger:      uint32(rand.Intn(10000) + 100),
+		DisclosedQuantity:    int32(rand.Intn(100) + 1),
+		TotalOrderQuantity:   int32(rand.Intn(1000) + 1),
+		LimitRate:            int32(rand.Intn(10000) + 100),
+		StopLossTrigger:      int32(rand.Intn(10000) + 100),
 		OrderValidDate:       randomDate(),
 		OrderType:            randomRune("SLM"),
 		AckTime:              randomTime(),
 		SpecialFlag:          randomRune("YN"),
 		OrderFlow:            randomRune("BS"),
-		SpreadOrderIndicator: randomString(2),
+		SpreadOrderIndicator: randomRune("*"),
 		Remarks:              fmt.Sprintf("Test Order %s", randomString(4)),
 		UserFlag:             randomRune("YN"),
 		ExchangeRemarks:      fmt.Sprintf("Exchange Remarks %s", randomString(4)),

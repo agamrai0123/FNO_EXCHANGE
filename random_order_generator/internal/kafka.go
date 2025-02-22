@@ -9,7 +9,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/agamrai0123/FNO_EXCHANGE/ingest/models"
+	"github.com/agamrai0123/FNO_EXCHANGE/random_order_generator/models"
 	"github.com/segmentio/kafka-go"
 )
 
