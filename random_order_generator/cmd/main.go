@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	pb "github.com/agamrai0123/FNO_EXCHANGE/proto"
@@ -86,34 +87,62 @@ func main() {
 	defer conn.Close()
 
 	client := pb.NewIngestClient(conn)
-
+	now := time.Now()
+	fmt.Println("Start Time: ", now)
 	// Generate and send a single random order.
-	order := internal.GenerateRandomOrder()
-	fmt.Printf("Generated single order: %+v\n", order)
-	protoOrder := convertToProto(order)
+	// order := internal.GenerateRandomOrder()
+	// fmt.Printf("Generated single order: %+v\n", order)
+	// protoOrder := convertToProto(order)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// defer cancel()
 
-	resp, err := client.SendOrder(ctx, protoOrder)
-	if err != nil {
-		log.Fatalf("Error sending order: %v", err)
-	}
-	fmt.Printf("Response for single order: success=%v, message=%s\n", resp.Success, resp.Message)
+	// resp, err := client.SendOrder(ctx, protoOrder)
+	// if err != nil {
+	// 	log.Fatalf("Error sending order: %v", err)
+	// }
+	// fmt.Printf("Response for single order: success=%v, message=%s\n", resp.Success, resp.Message)
 
 	// Generate and send multiple random orders.
-	orders := internal.GenerateRandomOrders(100)
-	fmt.Printf("Generated %d orders\n", len(orders))
-	for _, o := range orders {
-		protoOrder := convertToProto(o)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		// Note: Call cancel in each loop iteration to avoid context leaks.
-		defer cancel()
-		resp, err := client.SendOrder(ctx, protoOrder)
-		if err != nil {
-			log.Printf("Error sending order %v: %v", o.SessionId, err)
-			continue
-		}
-		fmt.Printf("Response for order %v: success=%v, message=%s\n", o.SessionId, resp.Success, resp.Message)
+	// orders := internal.GenerateRandomOrders(10000)
+	// fmt.Printf("Generated %d orders\n", len(orders))
+	// for i := 0; i < 10000; i++ {
+	// o := internal.GenerateRandomOrder()
+	// protoOrder := convertToProto(o)
+	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// // Note: Call cancel in each loop iteration to avoid context leaks.
+	// defer cancel()
+	// resp, err := client.SendOrder(ctx, protoOrder)
+	// if err != nil {
+	// 	log.Printf("Error sending order %v: %v", o.SessionId, err)
+	// 	continue
+	// }
+	// fmt.Printf("Response for order %v: success=%v, message=%s\n", o.SessionId, resp.Success, resp.Message)
+	// }
+	var wg sync.WaitGroup
+	numOrders := 100000
+	wg.Add(numOrders)
+	for i := 0; i < numOrders; i++ {
+		go generateOrder(client, &wg)
 	}
+	wg.Wait()
+	diff := time.Since(now)
+	fmt.Println("End Time: ", time.Now())
+	fmt.Printf("Total Time taken: %v\n", diff)
+}
+
+func generateOrder(client pb.IngestClient, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	o := internal.GenerateRandomOrder()
+	protoOrder := convertToProto(o)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	_, err := client.SendOrder(ctx, protoOrder)
+	if err != nil {
+		log.Printf("Error sending order %v: %v", o.SessionId, err)
+		return
+	}
+	// fmt.Printf("Response for order %v: success=%v, message=%s\n", o.SessionId, resp.Success, resp.Message)
 }

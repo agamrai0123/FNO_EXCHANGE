@@ -12,14 +12,9 @@ import (
 var (
 	exchangeCodes = []string{"NSE", "BSE", "MCX", "NFO", "BFO"}
 	channel       = []string{"CNT", "SYS", "WEB", "OFF"}
-	// productTypes  = []string{"CASH", "FUTURES", "OPTIONS"}
-	underlyings = []string{"NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "INFY"}
-	// optionTypes = []string{"CE", "PE", "XX"}
-	// exerciseTypes = []string{"EUROPEAN", "AMERICAN"}
-	// orderTypes    = []string{"MARKET", "LIMIT", "SL", "SL-M"}
-	// caLevels    = []string{"HIGH", "MEDIUM", "LOW"}
-	callSources = []string{"WEB", "MOBILE", "API"}
-	vendorIds   = []string{"V001", "V002", "V003"}
+	underlyings   = []string{"NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "INFY"}
+	callSources   = []string{"WEB", "MOBILE", "API"}
+	vendorIds     = []string{"V001", "V002", "V003"}
 )
 
 // Helper function to generate random string of given length
@@ -87,13 +82,13 @@ func GenerateRandomOrder() models.Order {
 		NKDBlockedFlag:       randomRune("YN"),
 		ModifyTradeDate:      randomDate(),
 		ModifyTradeTime:      randomTime(),
-		SLMFlag:              randomRune("YN"),
+		SLMFlag:              randomRune("SLM"),
 		DisclosedQuantity:    int32(rand.Intn(100) + 1),
 		TotalOrderQuantity:   int32(rand.Intn(1000) + 1),
 		LimitRate:            int32(rand.Intn(10000) + 100),
 		StopLossTrigger:      int32(rand.Intn(10000) + 100),
 		OrderValidDate:       randomDate(),
-		OrderType:            randomRune("SLM"),
+		OrderType:            randomRune("IT"),
 		AckTime:              randomTime(),
 		SpecialFlag:          randomRune("YN"),
 		OrderFlow:            randomRune("BS"),
