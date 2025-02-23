@@ -1,0 +1,11 @@
+Box:
+  conn_type: tcp
+  conn_host: localhost
+  conn_port: 3000
+  box_id: 1
+  timeout: 5000
+  tcp : 
+    keepalive_period :  30
+    keepidle : 30
+    keepintvl : 10
+    keepcntl : 3
