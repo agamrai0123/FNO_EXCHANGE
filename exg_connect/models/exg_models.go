@@ -137,9 +137,9 @@ type ST_BROKER_ELIGIBILITY_PER_MKT struct {
 // 278 bytes
 type SIGN_ON_REQUEST_IN struct {
 	MessageHeader           MESSAGE_HEADER
-	UserID                  int32
+	UserId                  int32
 	Reserved1               [8]int8
-	Passsword               [8]int8
+	Password                [8]int8
 	Reserved2               [8]int8
 	NewPassword             [8]int8
 	TraderName              [26]int8
@@ -169,9 +169,9 @@ type SIGN_ON_REQUEST_IN struct {
 // 278 bytes
 type SIGN_ON_REQUEST_OUT struct {
 	MessageHeader           MESSAGE_HEADER
-	UserID                  int32
+	UserId                  int32
 	Reserved1               [8]int8
-	Passsword               [8]int8
+	Password                [8]int8
 	Reserved2               [8]int8
 	NewPassword             [8]int8
 	TraderName              [26]int8
