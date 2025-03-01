@@ -2,8 +2,8 @@ package request_handlers
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/binary"
-	"fmt"
 	"log"
 	"net"
 
@@ -35,9 +35,8 @@ func SendBoxSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, 
 	}
 
 	bufbytes := buf.Bytes()
-
 	// Create MD5 sum
-	checksum := utils.GetMD5Hash(bufbytes)
+	checksum := md5.Sum(bufbytes)
 
 	// Encrypt data
 	encryptedBuf, err := utils.EncryptAES(GatewayInfo.CryptographicKey, GatewayInfo.CryptographicIV, bufbytes)
@@ -47,15 +46,15 @@ func SendBoxSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, 
 	}
 
 	length := make([]byte, 2)
-	binary.LittleEndian.PutUint16(length, uint16(request.MessageHeader.MessageLength))
+	binary.LittleEndian.PutUint16(length, uint16(request.MessageHeader.MessageLength+20))
 	sequence := make([]byte, 4)
 	binary.LittleEndian.PutUint32(sequence, seq)
-	packet := append(append(append(length, sequence...), checksum...), encryptedBuf...)
+	packet := append(append(append(length, sequence...), checksum[:]...), encryptedBuf...)
 
 	// Write to Socket
 	_, err = conn.Write(packet)
 	if err != nil {
-		fmt.Println("Error sending message:", err)
+		log.Println("Error sending message:", err)
 		return err
 	}
 	log.Printf("box sign-on request sent successfully")

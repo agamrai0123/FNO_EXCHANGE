@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -36,19 +35,11 @@ func BoxRegistration(GatewayInfo *models.GatewayRouterResponse) (net.Conn, error
 		log.Printf("error while serializing request: %v", err)
 		return nil, err
 	}
-	sockInfo := models.SocketInfo{
-		Conn_type: "tcp",
-		Conn_host: GatewayInfo.IPAddress,
-		Conn_port: strconv.FormatInt(int64(GatewayInfo.Port), 10),
-		Timeout:   5 * time.Second,
-	}
-	fmt.Println("GatewayInfo: ", GatewayInfo)
-	fmt.Println("SocketInfo: ", sockInfo)
 
 	// Connect to Socket
-	conn, err := net.DialTimeout(sockInfo.Conn_type, sockInfo.Conn_host+":"+sockInfo.Conn_port, sockInfo.Timeout)
+	conn, err := net.DialTimeout("tcp", GatewayInfo.IPAddress+":"+strconv.FormatInt(int64(GatewayInfo.Port), 10), 5*time.Second)
 	if err != nil {
-		fmt.Println("Error connecting to server:", err)
+		log.Println("Error connecting to server:", err)
 		return nil, err
 	}
 	tcpConn, ok := conn.(*net.TCPConn)
@@ -64,7 +55,7 @@ func BoxRegistration(GatewayInfo *models.GatewayRouterResponse) (net.Conn, error
 	// Write to Socket
 	_, err = conn.Write(buf.Bytes())
 	if err != nil {
-		fmt.Println("Error sending message:", err)
+		log.Println("Error sending message:", err)
 		return nil, err
 	}
 	log.Printf("box registration request sent successfully")
@@ -73,7 +64,7 @@ func BoxRegistration(GatewayInfo *models.GatewayRouterResponse) (net.Conn, error
 	response := make([]byte, RespStructSize)
 	_, err = io.ReadFull(conn, response)
 	if err != nil {
-		fmt.Println("failed to ReadFull:", err)
+		log.Println("failed to ReadFull:", err)
 		return nil, err
 	}
 
@@ -87,6 +78,6 @@ func BoxRegistration(GatewayInfo *models.GatewayRouterResponse) (net.Conn, error
 	br := &models.SECURE_BOX_REGISTRATION_RESPONSE{}
 	br.MessageHeader = *messageHeader
 
-	log.Printf("box registration response received successfully: %+v", br)
+	log.Println("box registration response received successfully")
 	return conn, nil
 }

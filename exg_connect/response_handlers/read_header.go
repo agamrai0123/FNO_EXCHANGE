@@ -12,7 +12,7 @@ func GetHeader(conn net.Conn, buf []byte) (*models.MESSAGE_HEADER, error) {
 	// buf := make([]byte, binary.Size(Header))
 	// err := utils.SocketRead(conn, buf)
 	// if err != nil {
-	// 	fmt.Println("failed to Read:", err)
+	// 	log.Println("failed to Read:", err)
 	// 	return Header, err
 	// }
 	Header.TransactionCode = int16(binary.LittleEndian.Uint16(buf[0:2]))

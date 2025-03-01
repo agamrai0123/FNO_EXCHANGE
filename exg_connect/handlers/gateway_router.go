@@ -16,15 +16,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GatewayRouter() (*models.GatewayRouterResponse, error) {
+func GatewayRouter() (net.Conn, *models.GatewayRouterResponse, error) {
 	target := "box"
 	const totalSize = int16(48)
 
 	// Load configuration
 	conf, err := loadConfig()
 	if err != nil {
-		fmt.Println("Error during loading config")
-		return nil, err
+		log.Println("Error during loading config")
+		return nil, nil, err
 	}
 
 	// Create Packet
@@ -43,7 +43,7 @@ func GatewayRouter() (*models.GatewayRouterResponse, error) {
 	err = binary.Write(buf, binary.LittleEndian, request)
 	if err != nil {
 		log.Printf("Error while serializing request: %v", err)
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Connect to Socket
@@ -51,25 +51,24 @@ func GatewayRouter() (*models.GatewayRouterResponse, error) {
 		conf.GetString(target+".CONN_HOST")+":"+conf.GetString(target+".CONN_PORT"),
 		5*time.Second)
 	if err != nil {
-		fmt.Println("Error connecting to server:", err)
-		return nil, err
+		log.Println("Error connecting to server:", err)
+		return nil, nil, err
 	}
 	tcpConn, ok := conn.(*net.TCPConn)
 	if !ok {
 		log.Println("Failed to set TCP_NODELAY")
-		return nil, err
+		return nil, nil, err
 	}
 	if err := tcpConn.SetNoDelay(true); err != nil {
 		log.Println("Error setting TCP_NODELAY:", err)
-		return nil, err
+		return nil, nil, err
 	}
-	defer conn.Close() // Gateway Router socket can be closed
 
 	// Write to Socket
 	_, err = conn.Write(buf.Bytes())
 	if err != nil {
-		fmt.Println("Error sending message:", err)
-		return nil, err
+		log.Println("Error sending message:", err)
+		return nil, nil, err
 	}
 	log.Printf("gateway router request sent successfully")
 
@@ -78,8 +77,8 @@ func GatewayRouter() (*models.GatewayRouterResponse, error) {
 	readbuf := make([]byte, 40)
 	_, err = io.ReadFull(conn, readbuf)
 	if err != nil {
-		fmt.Println("failed to ReadFull:", err)
-		return nil, err
+		log.Println("failed to ReadFull:", err)
+		return nil, nil, err
 	}
 
 	messageHeader, err := response_handlers.GetHeader(conn, readbuf)
@@ -99,7 +98,7 @@ func GatewayRouter() (*models.GatewayRouterResponse, error) {
 	log.Printf("GR_Response received successfully: %+v", gatewayResp)
 
 	gatewayRouterResp := parseGatewayRouterResp(gatewayResp)
-	return gatewayRouterResp, nil
+	return conn, gatewayRouterResp, nil
 }
 
 func getGatewayResp(conn net.Conn, Header *models.MESSAGE_HEADER) (*models.GR_RESPONSE, error) {
@@ -110,7 +109,6 @@ func getGatewayResp(conn net.Conn, Header *models.MESSAGE_HEADER) (*models.GR_RE
 	if ReadRemaining < (totalSize - 40) {
 		return nil, fmt.Errorf("buffer too short for GR_RESPONSE: expected %d bytes, got %d", totalSize, ReadRemaining)
 	}
-
 	if ReadRemaining <= 0 {
 		return nil, errors.New("invalid message length")
 	}
@@ -118,33 +116,27 @@ func getGatewayResp(conn net.Conn, Header *models.MESSAGE_HEADER) (*models.GR_RE
 	buf := make([]byte, ReadRemaining)
 	_, err := io.ReadFull(conn, buf)
 	if err != nil {
-		fmt.Println("failed to ReadFull:", err)
+		log.Println("failed to ReadFull:", err)
 		return nil, err
 	}
-
 	gatewayRouterResp.BoxId = int16(binary.LittleEndian.Uint16(buf[0:2]))
 	for i := range 5 {
 		gatewayRouterResp.BrokerId[i] = int8(buf[2+i])
 	}
-
 	gatewayRouterResp.Filler = int8(buf[7])
 	for i := range 16 {
 		gatewayRouterResp.IPAddress[i] = int8(buf[8+i])
 	}
-
 	gatewayRouterResp.Port = int32(binary.LittleEndian.Uint32(buf[24:28]))
 	for i := range 8 {
 		gatewayRouterResp.SessionKey[i] = int8(buf[28+i])
 	}
-
 	for i := range 32 {
 		gatewayRouterResp.CryptographicKey[i] = int8(buf[36+i])
 	}
-
 	for i := range 16 {
 		gatewayRouterResp.CryptographicIV[i] = int8(buf[68+i])
 	}
-
 	return gatewayRouterResp, nil
 }
 

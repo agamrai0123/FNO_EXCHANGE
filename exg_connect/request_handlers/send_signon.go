@@ -2,8 +2,8 @@ package request_handlers
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/binary"
-	"fmt"
 	"log"
 	"net"
 
@@ -54,7 +54,7 @@ func SendSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, seq
 	bufbytes := buf.Bytes()
 
 	// Create MD5 sum
-	Checksum := utils.GetMD5Hash(bufbytes)
+	Checksum := md5.Sum(bufbytes)
 
 	// Encrypt data
 	Encryptedbuf, err := utils.EncryptAES(GatewayInfo.CryptographicKey, GatewayInfo.CryptographicIV, bufbytes)
@@ -68,12 +68,12 @@ func SendSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, seq
 	sequence := make([]byte, 4)
 	binary.LittleEndian.PutUint32(sequence, seq)
 
-	packet := append(append(append(length, sequence...), Checksum...), Encryptedbuf...)
+	packet := append(append(append(length, sequence...), Checksum[:]...), Encryptedbuf...)
 
 	// Write to Socket
 	_, err = conn.Write(packet)
 	if err != nil {
-		fmt.Println("Error sending message:", err)
+		log.Println("Error sending message:", err)
 		return err
 	}
 	log.Printf("sign-on request sent successfully")

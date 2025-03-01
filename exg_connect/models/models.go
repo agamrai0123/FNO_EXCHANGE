@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 type GatewayRouterResponse struct {
 	IPAddress        string
 	Port             int32
@@ -11,16 +9,16 @@ type GatewayRouterResponse struct {
 	CryptographicIV  []byte
 }
 
-type SocketInfo struct {
-	Conn_type string
-	Conn_host string
-	Conn_port string
-	Timeout   time.Duration
-}
+// type SocketInfo struct {
+// 	Conn_type string
+// 	Conn_host string
+// 	Conn_port string
+// 	Timeout   time.Duration
+// }
 
 type ExchangeData struct {
-	Length         int16
-	SequenceNumber int32
+	Length         uint16
+	SequenceNumber uint32
 	Checksum       []byte
 	MessageData    []byte
 }
