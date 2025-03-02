@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	"github.com/agamrai0123/FNO_EXCHANGE/exg_connect/handlers"
 	"github.com/agamrai0123/FNO_EXCHANGE/exg_connect/request_handlers"
+	"github.com/agamrai0123/FNO_EXCHANGE/exg_connect/threads"
 )
 
 func main() {
@@ -31,12 +33,15 @@ func main() {
 		log.Printf("Error while Box Registration :%+v", err)
 	}
 
-	time.Sleep(200 * time.Second)
-	// err = request_handlers.SendSignonReq(conn, gatewayInfo, seq)
-	// if err != nil {
-	// 	log.Printf("Error while SignOn-In :%+v", err)
-	// }
+	// time.Sleep(200 * time.Second)
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	// go threads.GetExchangeResp(conn, gatewayInfo)
-	// go threads.SendToExchange(conn)
+	threads.SendToExchange(sendConn, gatewayInfo, seq)
+	go func() {
+		defer wg.Done()
+		threads.GetExchangeResp(recvConn, gatewayInfo)
+	}()
+	wg.Wait()
+
 }

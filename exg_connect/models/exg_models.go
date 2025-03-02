@@ -160,6 +160,7 @@ type SIGN_ON_REQUEST_IN struct {
 	BrokerEligibilityperMkt ST_BROKER_ELIGIBILITY_PER_MKT
 	MemberType              int16
 	ClearingStatus          int8
+	BrokerName              [25]int8
 	Reserved5               [16]int8
 	Reserved6               [16]int8
 	Reserved7               [16]int8

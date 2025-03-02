@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"time"
 
 	"github.com/agamrai0123/FNO_EXCHANGE/exg_connect/config"
 	"github.com/agamrai0123/FNO_EXCHANGE/exg_connect/models"
@@ -42,6 +43,7 @@ func SendSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, seq
 		},
 		MemberType:     0,
 		ClearingStatus: 0,
+		BrokerName:     config.BrokerName,
 	}
 
 	// Serialize Data
@@ -64,11 +66,13 @@ func SendSignonReq(conn net.Conn, GatewayInfo *models.GatewayRouterResponse, seq
 	}
 
 	length := make([]byte, 2)
-	binary.LittleEndian.PutUint16(length, uint16(request.MessageHeader.MessageLength))
+	binary.LittleEndian.PutUint16(length, uint16(request.MessageHeader.MessageLength+20))
 	sequence := make([]byte, 4)
 	binary.LittleEndian.PutUint32(sequence, seq)
 
 	packet := append(append(append(length, sequence...), Checksum[:]...), Encryptedbuf...)
+
+	conn.SetWriteDeadline(time.Now().Add(2 * time.Second)) // Timeout after 2 seconds
 
 	// Write to Socket
 	_, err = conn.Write(packet)

@@ -95,7 +95,7 @@ func GatewayRouter() (net.Conn, *models.GatewayRouterResponse, error) {
 	if err != nil {
 		log.Println("failed to read grResponse", messageHeader.TransactionCode, err)
 	}
-	log.Printf("GR_Response received successfully: %+v", gatewayResp)
+	log.Print("GR_Response received successfully")
 
 	gatewayRouterResp := parseGatewayRouterResp(gatewayResp)
 	return conn, gatewayRouterResp, nil
