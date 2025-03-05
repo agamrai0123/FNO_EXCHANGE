@@ -59,3 +59,31 @@ type Order struct {
 	OrderReference       string  `json:"order_reference"`
 	CoverOrderRef        string  `json:"cover_order_ref"`
 }
+
+type ExchangeOrder struct {
+	EspId                      string  `json:"esp_id"`
+	AlgoId                     string  `json:"algo_id"`
+	SourceFlag                 rune    `json:"source_flag"`
+	TraderId                   int32   `json:"trader_id"`
+	RequestType                rune    `json:"request_type"`
+	UserType                   string  `json:"user_type"`
+	TokenId                    int32   `json:"token_id"`
+	OrderNumber                float64 `json:"order_number"`
+	ClientIndicator            rune    `json:"client_indicator"`
+	MatchAccount               string  `json:"match_Account"`
+	SLMFlag                    rune    `json:"slm_flag"`
+	OrderFlow                  rune    `json:"order_flow"`
+	DisclosedQuantity          int32   `json:"disclosed_quantity"`
+	DisclosedQuantityRemaining int32   `json:"disclosed_quantity_remaining"`
+	Volume                     int32   `json:"volume"`
+	VolumeRemaining            int32   `json:"volume_remaining"`
+	Price                      int32   `json:"price"`
+	TriggerPrice               int32   `json:"trigger_price"`
+	GoodTillDate               string  `json:"good_till_date"`
+	MinFillAONVolume           int32   `json:"min_fill_aon_volume"`
+	LastModified               string  `json:"last_modified"`
+	OrderType                  rune    `json:"order_type"`
+	BranchId                   int16   `json:"branch_id"`
+	BrokerId                   string  `json:"broker_id"`
+	OrderSequence              int32   `json:"order_seq"`
+}
